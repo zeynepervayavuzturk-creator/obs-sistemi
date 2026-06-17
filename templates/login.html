@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block no_auth_content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+                <i class="fa-solid fa-graduation-cap text-3xl text-blue-600"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-gray-900">Öğrenci Bilgi Sistemi</h2>
+            <p class="mt-2 text-sm text-gray-500">Lütfen sisteme giriş yapınız</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form class="space-y-6" action="{{ url_for('login') }}" method="POST">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">Kullanıcı Adı</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-user text-gray-400"></i>
+                    </div>
+                    <input id="username" name="username" type="text" required class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 px-3 border" placeholder="Kullanıcı adınızı giriniz">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Şifre</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-lock text-gray-400"></i>
+                    </div>
+                    <input id="password" name="password" type="password" required class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 px-3 border" placeholder="Şifrenizi giriniz">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Giriş Yap
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-6 border-t border-gray-100 pt-4 text-center text-xs text-gray-400">
+            <p>Admin, Akademisyen ve Öğrenci girişi bu ekrandan yapılmaktadır.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

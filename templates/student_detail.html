@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block header_title %}Öğrenci Detayı{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('academician_dashboard') }}" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+        <i class="fa-solid fa-arrow-left mr-2"></i> Derslere Dön
+    </a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 flex items-center space-x-6">
+    <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-3xl">
+        {{ student.name_surname[0] }}
+    </div>
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">{{ student.name_surname }}</h2>
+        <p class="text-gray-500 mt-1"><i class="fa-solid fa-id-card mr-2"></i>Öğrenci No: <span class="font-medium text-gray-700">{{ student.student_number }}</span></p>
+        <p class="text-gray-500 mt-1"><i class="fa-solid fa-envelope mr-2"></i>Kullanıcı Adı: <span class="font-medium text-gray-700">{{ student.username }}</span></p>
+    </div>
+</div>
+
+<div class="mb-6">
+    <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Aldığı Tüm Dersler ve Başarı Durumu</h3>
+    {% if not enrollments %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700">
+        <p>Bu öğrenci henüz hiçbir derse kayıtlı değil.</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    {% for en in enrollments %}
+    {% set avg = (en.vize * 0.3) + (en.final * 0.4) + (en.proje * 0.15) + (en.sunum * 0.15) %}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+        
+        <!-- Ders Başlığı ve Durum -->
+        <div class="bg-gray-50 px-6 py-5 border-b border-gray-100 flex justify-between items-start">
+            <div>
+                <h4 class="text-lg font-bold text-gray-900"><i class="fa-solid fa-graduation-cap mr-2 text-blue-500"></i>{{ en.course.name }}</h4>
+                <p class="text-sm text-gray-500 mt-1"><i class="fa-solid fa-user-tie mr-1"></i> {{ en.course.academician.name_surname if en.course.academician else 'Belirtilmedi' }}</p>
+            </div>
+            
+            {% if avg >= 50 %}
+                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-full border border-green-200">Geçti</span>
+            {% else %}
+                <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider rounded-full border border-red-200">Kaldı</span>
+            {% endif %}
+        </div>
+        
+        <div class="p-6 flex-1 flex flex-col justify-between space-y-6">
+            <!-- Not Tablosu -->
+            <div class="grid grid-cols-4 gap-2 text-center">
+                <div>
+                    <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Vize</p>
+                    <p class="text-lg font-bold text-gray-800">{{ "%.1f"|format(en.vize) }}</p>
+                    <p class="text-[10px] text-gray-400">(%30)</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Final</p>
+                    <p class="text-lg font-bold text-gray-800">{{ "%.1f"|format(en.final) }}</p>
+                    <p class="text-[10px] text-gray-400">(%40)</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Proje</p>
+                    <p class="text-lg font-bold text-gray-800">{{ "%.1f"|format(en.proje) }}</p>
+                    <p class="text-[10px] text-gray-400">(%15)</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 font-semibold uppercase mb-1">Sunum</p>
+                    <p class="text-lg font-bold text-gray-800">{{ "%.1f"|format(en.sunum) }}</p>
+                    <p class="text-[10px] text-gray-400">(%15)</p>
+                </div>
+            </div>
+            
+            <!-- Ortalama Çubuğu -->
+            <div>
+                <div class="flex justify-between items-end mb-1">
+                    <span class="text-sm font-semibold text-gray-700">Ders Ortalaması</span>
+                    <span class="text-lg font-bold {% if avg >= 50 %}text-green-600{% else %}text-red-600{% endif %}">{{ "%.2f"|format(avg) }} / 100</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="h-2.5 rounded-full {% if avg >= 50 %}bg-green-500{% else %}bg-red-500{% endif %}" style="width: {{ avg }}%"></div>
+                </div>
+            </div>
+
+            <!-- Devamsızlık -->
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-100 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center {% if en.devamsizlik > 5 %}bg-red-100 text-red-600{% elif en.devamsizlik > 2 %}bg-yellow-100 text-yellow-600{% else %}bg-blue-100 text-blue-600{% endif %} mr-4">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700">Devamsızlık</p>
+                        <p class="text-xs text-gray-500">Dönem içi toplam devamsızlık gününüz</p>
+                    </div>
+                </div>
+                <div class="text-xl font-bold {% if en.devamsizlik > 5 %}text-red-600{% elif en.devamsizlik > 2 %}text-yellow-600{% else %}text-gray-800{% endif %}">
+                    {{ en.devamsizlik }} <span class="text-sm font-normal text-gray-500">Gün</span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
